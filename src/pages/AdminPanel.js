@@ -1,31 +1,51 @@
-import { useState } from "react";
+import React, { useState } from 'react';
 
-const AdminPanel = () => {
-    const [task, setTask] = useState({title: '', assignee: '', description: ''});
+const AdminPanel = ({ addTask }) => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        console.log(task)
+  // Function to generate a unique task ID
+  const generateTaskId = () => {
+    return `task-${Math.floor(Math.random() * 10000)}`;
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    
+    // Validate that the task has a title and description
+    if (title.length < 3 || description.length < 5) {
+      alert("Title must be at least 3 characters, and description at least 5 characters");
+      return;
     }
 
-    return (
-        <div>
-            <h1>Admin Panel</h1>
-            <h3>Create a task</h3>
-            <form>
-                <label>Task title:</label>
-                <input placeholder="input the task" type="text" value={task.title} onChange={(e) => setTask({...task, title: e.target.value})} />
+    // Create a new task object
+    const newTask = {
+      id: generateTaskId(),
+      content: title // In a real case, you'd combine title and description
+    };
 
-                <label>Who will do the task?</label>
-                <input placeholder="input employee name" type="text" value={task.assignee} onChange={(e) => setTask({...task, assignee: e.target.value})} />
+    // Add the new task to the todo list via the addTask function passed as a prop
+    addTask(newTask);
 
-                <label>Task description</label>
-                <textarea placeholder="Describe the task in detail" value={task.description} onChange={(e) => setTask({...task, description: e.target.value})} />
+    // Clear the form fields
+    setTitle('');
+    setDescription('');
+  };
 
-                <button type="submit" onSubmit={handleSubmit()}>Create task</button>
-            </form>
-        </div>
-    );
+  return (
+    <div>
+      <h1>Admin Panel - Create a Task</h1>
+      <form onSubmit={handleSubmit}>
+        <label>Title:</label>
+        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+
+        <label>Description:</label>
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
+
+        <button type="submit">Create Task</button>
+      </form>
+    </div>
+  );
 };
 
 export default AdminPanel;
