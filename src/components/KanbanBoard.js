@@ -1,25 +1,19 @@
-import { useState } from 'react';
+import React from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import './KanbanBoard.css';
 
-const initialTasks = {
-  todo: [{ id: '1', content: 'Bake' }, { id: '2', content: 'Cook' }],
-  inProgress: [{ id: '3', content: 'Skate' }],
-  done: [{ id: '4', content: 'Play' }]
-};
+const KanbanBoard = ({ tasks, setTasks }) => {
 
-const KanbanBoard = () => {
-  const [tasks, setTasks] = useState(initialTasks);
-
+  tasks = tasks || {};
   const onDragEnd = (result) => {
-    const { source, destination } = result;
-
+      const { source, destination } = result;
     if (!destination) return;
 
-    const sourceCol = tasks[source.droppableId];
-    const destCol = tasks[destination.droppableId];
-    const [removed] = sourceCol.splice(source.index, 1);
-    destCol.splice(destination.index, 0, removed);
+    const sourceCol = Array.from(tasks[source.droppableId]);
+    const destCol = Array.from(tasks[destination.droppableId]);
+    const [movedTask] = sourceCol.splice(source.index, 1);
+    destCol.splice(destination.index, 0, movedTask);
+
 
     setTasks({
       ...tasks,
@@ -27,7 +21,7 @@ const KanbanBoard = () => {
       [destination.droppableId]: destCol
     });
   };
-
+  console.log('Current Tasks:', tasks);
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="kanban-board">
@@ -41,19 +35,23 @@ const KanbanBoard = () => {
               >
                 <h2>{colId}</h2>
                 {tasks[colId].map((task, index) => (
-                  <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
-                    {(provided) => (
-                      <div
-                        className="task-item"
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        {task.content}
-                      </div>
-                    )}
+                  <Draggable key={task.id.toString()} draggableId={task.id.toString()} index={index}>
+                    {(provided) => {
+                      console.log('Draggable ID:', task.id);  
+                      return (
+                        <div
+                          className="task-item"
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          {task.content}
+                        </div>
+                      );
+                    }}
                   </Draggable>
                 ))}
+
                 {provided.placeholder}
               </div>
             )}
@@ -65,5 +63,3 @@ const KanbanBoard = () => {
 };
 
 export default KanbanBoard;
-
-
